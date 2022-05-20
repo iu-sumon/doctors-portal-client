@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import auth from '../../firebase.init';
 
 
-const BookingModal = ({ treatment, date, setTreatment,refetch }) => {
+const BookingModal = ({ treatment, date, setTreatment, refetch }) => {
 
     const { _id, name, slots } = treatment;
     const [user] = useAuthState(auth);
@@ -28,9 +28,9 @@ const BookingModal = ({ treatment, date, setTreatment,refetch }) => {
 
         }
 
-        
 
-        fetch('http://localhost:5000/booking', {
+
+        fetch(' https://stormy-sands-48896.herokuapp.com/booking', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json',
@@ -49,7 +49,7 @@ const BookingModal = ({ treatment, date, setTreatment,refetch }) => {
                 else {
                     toast.error(`Already have an appointment on, ${data.booking?.date} at ${data.booking.slot}`)
                 }
-                
+
                 //skip duplicate treatment for one user code end
                 refetch()
                 setTreatment(null) //to close the modal

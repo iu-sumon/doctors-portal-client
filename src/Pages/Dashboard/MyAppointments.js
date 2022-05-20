@@ -14,7 +14,7 @@ const MyAppointments = () => {
     useEffect(() => {
 
         if (user) {
-            fetch(`http://localhost:5000/booking?patientEmail=${user.email}`, {
+            fetch(` https://stormy-sands-48896.herokuapp.com/booking?patientEmail=${user.email}`, {
 
                 method: 'GET',
                 headers: {

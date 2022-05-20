@@ -5,9 +5,9 @@ import UserRow from './UserRow';
 
 const Users = () => {
 
-    const { data: users, isLoading, refetch } = useQuery('users', () => fetch('http://localhost:5000/users', {
+    const { data: users, isLoading, refetch } = useQuery('users', () => fetch(' https://stormy-sands-48896.herokuapp.com/users', {
         method: 'GET', // for jwt implement
-        headers:{
+        headers: {
             authorization: `Bearer ${localStorage.getItem('accessToken')}` //for jwt implement
         }
     }).then(res => res.json()));
@@ -35,18 +35,18 @@ const Users = () => {
                     </thead>
 
                     <tbody>
-                       {
-                           users.map(user=><UserRow
+                        {
+                            users.map(user => <UserRow
 
-                           key={user._id}
-                           user={user}
-                           refetch={refetch}
+                                key={user._id}
+                                user={user}
+                                refetch={refetch}
 
-                           ></UserRow>)
-                       }
+                            ></UserRow>)
+                        }
                     </tbody>
 
-                    
+
                 </table>
             </div>
         </div>
