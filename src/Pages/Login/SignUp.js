@@ -1,59 +1,55 @@
-
+import React from 'react';
+import { useCreateUserWithEmailAndPassword, useSignInWithGoogle, useUpdateProfile } from 'react-firebase-hooks/auth';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
 import auth from '../../firebase.init';
-import { useSendPasswordResetEmail, useSignInWithEmailAndPassword, useSignInWithGoogle } from 'react-firebase-hooks/auth';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import Loading from '../Shared/Loading';
-import { useForm } from "react-hook-form";
 import useToken from '../../hooks/useToken';
+import Loading from '../Shared/Loading';
 
-const Login = () => {
+const SignUp = () => {
 
+    const [createUserWithEmailAndPassword, userEp, loadingEp, errorEp] = useCreateUserWithEmailAndPassword(auth);
     const [signInWithGoogle, userG, loadingG, errorG] = useSignInWithGoogle(auth);
-    const [sendPasswordResetEmail, sending] = useSendPasswordResetEmail(auth);
-    const { register, formState: { errors }, handleSubmit, getValues } = useForm();
-    const [
-        signInWithEmailAndPassword,
-        userEp,
-        loadingEp,
-        errorEp,
-    ] = useSignInWithEmailAndPassword(auth);
+    const { register, formState: { errors }, handleSubmit } = useForm();
+    const [updateProfile, updating, error] = useUpdateProfile(auth);
 
+    //for JWT
+    const [token] = useToken(userEp || userG) //token user parameter hisabe jasche
 
-    const [token] = useToken(userEp || userG)
     const navigate = useNavigate();
-    let location = useLocation();
+
     let getError;
-    let from = location.state?.from?.pathname || "/";
 
-
-    if (loadingEp || loadingG || sending) {
-
+    if (loadingEp || loadingG || updating) {
         return <Loading></Loading>
     }
 
+    if (errorEp || errorG || error) {
 
-    if (errorEp || errorG) {
-
-        getError = <small className='text-red-600'>Error: {errorEp?.message || errorG?.message}</small>
+        getError = <small className='text-red-600'>Error: {errorEp?.message || errorG?.message || error?.message}</small>
     }
 
-    if (token) {
+    if (token) { //token pele navigate korbo
+      
+         navigate('/appointment')
 
-        navigate(from, { replace: true });
     }
 
-    const onSubmit = data => {
 
-        signInWithEmailAndPassword(data.email, data.password)
+    const onSubmit = async (data) => {
+
+        await createUserWithEmailAndPassword(data.email, data.password)
+        await updateProfile({ displayName: data.name })
 
     };
+
 
     return (
         <div>
             <div className='flex justify-center items-center h-screen'>
                 <div className="card w-96 bg-base-100 shadow border-2">
                     <div className="card-body">
-                        <h2 className="text-center text-2xl font-bold">Login</h2>
+                        <h2 className="text-center text-2xl font-bold">Sign Up</h2>
 
                         <div className="card flex-shrink-0 w-full max-w-sm  bg-base-100">
                             <div className="card-body">
@@ -62,6 +58,30 @@ const Login = () => {
 
                                 <form onSubmit={handleSubmit(onSubmit)}>
 
+                                    <div className="form-control">
+
+                                        <label className="label">
+                                            <span className="label-text">Name</span>
+                                        </label>
+
+                                        <input
+                                            {...register("name", {
+                                                required: {
+                                                    value: true,
+                                                    message: 'Name is Required'
+                                                },
+
+                                            })}
+                                            type="name"
+                                            placeholder="Enter your name"
+                                            className="input input-bordered" />
+
+                                        <label className="label">
+                                            {errors.name?.type === 'required' && <span className="label-text-alt text-red-700">{errors.name?.message}</span>}
+
+                                        </label>
+
+                                    </div>
                                     <div className="form-control">
 
                                         <label className="label">
@@ -117,23 +137,17 @@ const Login = () => {
                                             {errors.password?.type === 'required' && <span className="label-text-alt text-red-700">{errors.password?.message}</span>}
                                             {errors.password?.type === ' minLength' && <span className="label-text-alt text-red-700">{errors.password?.message}</span>}
 
-                                            <button onClick={async () => {
 
-                                                const email = getValues("email");
-                                                await sendPasswordResetEmail(email);
-                                                alert('Sent email');
-
-                                            }} className="label-text-alt link link-hover text-secondary">Forgot password?</button>
 
                                         </label>
                                     </div>
 
-                                    <input type="Submit" value='Login' className="btn w-full max-w-xs text-white" />
+                                    <input type="Submit" value='Sign Up' className="btn w-full max-w-xs text-white" />
                                 </form>
 
                                 {/* React hook form code end */}
 
-                                <p className='label-text-alt'>New to doctors portal? <Link to="/signup" className="label-text-alt link link-hover text-secondary">Create new account</Link>
+                                <p className='label-text-alt'>Already have an account? <Link to="/login" className="label-text-alt link link-hover text-secondary">Please login</Link>
                                 </p>
                                 {getError}
 
@@ -158,4 +172,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default SignUp;

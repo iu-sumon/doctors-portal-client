@@ -1,53 +1,117 @@
 import { format } from 'date-fns';
 import React from 'react';
-const BookingModal = ({ treatment, date, setTreatment }) => {
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { toast } from 'react-toastify';
+import auth from '../../firebase.init';
+
+
+const BookingModal = ({ treatment, date, setTreatment,refetch }) => {
 
     const { _id, name, slots } = treatment;
+    const [user] = useAuthState(auth);
+    const formattedDate = format(date, 'PP');
 
     const handleBooking = (event) => {
+
         event.preventDefault()
         const slot = event.target.slot.value;
-        console.log(_id, name, slot);
-        setTreatment(null)
+        const booking =
+        {
+            treatmentId: _id,
+            treatmentName: name,
+            date: formattedDate,
+            slot,
+            patientEmail: user.email,
+            patientName: user.displayName,
+            phoneNumber: event.target.number.value
+
+
+        }
+
+        
+
+        fetch('http://localhost:5000/booking', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            body: JSON.stringify(booking),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+
+                //skip duplicate treatment for one user code start
+
+                if (data.success) {
+                    toast(`Appointment is set, ${formattedDate} at ${slot}`)
+                }
+
+                else {
+                    toast.error(`Already have an appointment on, ${data.booking?.date} at ${data.booking.slot}`)
+                }
+                
+                //skip duplicate treatment for one user code end
+                refetch()
+                setTreatment(null) //to close the modal
+            });
+
+
     }
 
-
-
-
-
     return (
-        <div>
+        <section>
 
 
-            <input type="checkbox" id="booking-modal" class="modal-toggle" />
+            <input type="checkbox" id="booking-modal" className="modal-toggle" />
 
-            <div class="modal modal-bottom sm:modal-middle">
-                <div class="modal-box">
-                    <label for="booking-modal" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
-                    <h3 class="font-bold text-lg text-center text-secondary">{name}</h3>
+            <div className="modal modal-bottom sm:modal-middle">
 
+                <div className="modal-box">
+
+
+                    <label htmlFor="booking-modal" className="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+                    <h3 className="font-bold text-lg text-center text-secondary">{name}</h3>
+
+                    {/*............................ Modal form start...............................*/}
 
                     <form onSubmit={handleBooking} className='grid grid-cols-1 justify-items-center my-3'>
 
-                        <input type="text" disabled value={format(date, 'PP')} placeholder="Type here" class="input input-bordered w-full max-w-xs mb-2 shadow" />
-                        <select name='slot' class="select select-bordered w-full max-w-xs mb-2">
+                        <input type="text" disabled value={format(date, 'PP')} placeholder="Type here" className="input input-bordered w-full max-w-xs mb-2 shadow" />
+
+                        <select name='slot' className="select select-bordered w-full max-w-xs mb-2">
+
                             {
-                                slots.map(slot => <option value={slot}>{slot}</option>)
+                                slots.map((slot, index) => <option
+
+                                    key={index}
+
+                                    value={slot}
+
+                                >{slot}</option>)
                             }
 
                         </select>
 
-                        <input type="text" name='name' placeholder="Full Name" class="input input-bordered w-full max-w-xs mb-2 shadow" />
-                        <input type="number" name='number' placeholder="Phone Number" class="input input-bordered w-full max-w-xs mb-2 shadow" />
-                        <input type="text" name='email' placeholder="Email" class="input input-bordered w-full max-w-xs mb-2 shadow" />
-                        <input type="submit" placeholder="Type here" class="btn btn-secondary w-full max-w-xs mt-5 shadow" />
+                        <input type="name" disabled value={user?.displayName} name='name' className="input input-bordered w-full max-w-xs mb-2 shadow" />
+
+
+                        <input type="text" disabled value={user?.email} name='email' className="input input-bordered w-full max-w-xs mb-2 shadow" />
+
+                        <input type="number" placeholder="Phone Number" name='number' className="input input-bordered w-full max-w-xs mb-2 shadow" />
+
+                        <input type="submit" className="btn btn-secondary w-full max-w-xs mt-5 shadow" />
 
                     </form>
 
+                    {/*............................ Modal form End...............................*/}
 
                 </div>
+
+
             </div>
-        </div >
+
+
+        </section>
     );
 };
 

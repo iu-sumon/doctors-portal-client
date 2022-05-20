@@ -8,26 +8,26 @@ const Contact = () => {
                     <p className='text-center text-primary'>Contact Us</p>
                     <p className='text-2xl text-center text-white'>Stay connected with us</p>
                     <div>
-                        <div class="card flex-shrink-0 w-full max-w-sm mx-auto ">
-                            <div class="card-body">
-                                <div class="form-control">
+                        <div className="card flex-shrink-0 w-full max-w-sm mx-auto ">
+                            <div className="card-body">
+                                <div className="form-control">
 
-                                    <input type="text" placeholder="Email Address" class="input input-bordered shadow-lg" />
+                                    <input type="text" placeholder="Email Address" className="input input-bordered shadow-lg" />
                                 </div>
-                                <div class="form-control">
+                                <div className="form-control">
 
-                                    <input type="text" placeholder="Subject" class="input input-bordered shadow-lg" />
+                                    <input type="text" placeholder="Subject" className="input input-bordered shadow-lg" />
 
                                 </div>
-                                <div class='form-control'>
-                                    <textarea class="textarea shadow-lg" placeholder="Your message"></textarea>
+                                <div className='form-control'>
+                                    <textarea className="textarea shadow-lg" placeholder="Your message"></textarea>
                                 </div>
 
                             </div>
 
                         </div>
                         <div className='text-center pb-5'>
-                            <button class="btn btn-primary text-white px-[30px] ">Submit</button>
+                            <button className="btn btn-primary text-white px-[30px] ">Submit</button>
                         </div>
                     </div>
                 </div>
