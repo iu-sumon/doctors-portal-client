@@ -7,7 +7,8 @@ import auth from '../../firebase.init';
 
 const BookingModal = ({ treatment, date, setTreatment, refetch }) => {
 
-    const { _id, name, slots } = treatment;
+    const { _id, name, slots, price } = treatment;
+
     const [user] = useAuthState(auth);
     const formattedDate = format(date, 'PP');
 
@@ -15,22 +16,24 @@ const BookingModal = ({ treatment, date, setTreatment, refetch }) => {
 
         event.preventDefault()
         const slot = event.target.slot.value;
+
         const booking =
         {
             treatmentId: _id,
             treatmentName: name,
             date: formattedDate,
             slot,
+            price,
             patientEmail: user.email,
             patientName: user.displayName,
             phoneNumber: event.target.number.value
 
 
         }
+        console.log(booking);
 
 
-
-        fetch(' https://stormy-sands-48896.herokuapp.com/booking', {
+        fetch('http://localhost:5000/booking', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json',
@@ -98,6 +101,10 @@ const BookingModal = ({ treatment, date, setTreatment, refetch }) => {
                         <input type="text" disabled value={user?.email} name='email' className="input input-bordered w-full max-w-xs mb-2 shadow" />
 
                         <input type="number" placeholder="Phone Number" name='number' className="input input-bordered w-full max-w-xs mb-2 shadow" />
+
+
+                        <input type="name" disabled value={price} name='name' className="input input-bordered w-full max-w-xs mb-2 shadow" />
+
 
                         <input type="submit" className="btn btn-secondary w-full max-w-xs mt-5 shadow" />
 
